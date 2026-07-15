@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operación Flotabilidad 2030</title>
+<style>
+:root{
+  --navy:#102a43;
+  --blue:#176b87;
+  --cyan:#63d4e5;
+  --paper:#f9fdff;
+  --ink:#18364a;
+  --yellow:#ffd65c;
+  --green:#25ad69;
+  --red:#e75a64;
+  --soft:#d8eaf0;
+  --water:#8ee7f4;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:"Trebuchet MS",Arial,sans-serif}
+body{
+  color:white;
+  background:
+   radial-gradient(circle at 12% 14%,rgba(255,255,255,.18) 0 2px,transparent 3px),
+   radial-gradient(circle at 80% 25%,rgba(255,255,255,.13) 0 2px,transparent 3px),
+   linear-gradient(145deg,#0b334e,#19758b);
+}
+.bubble{position:fixed;border-radius:50%;border:3px solid rgba(255,255,255,.12);z-index:0}
+.b1{width:170px;height:170px;left:-45px;bottom:-45px}
+.b2{width:240px;height:240px;right:-70px;top:-75px}
+.app{
+  width:min(1180px,96vw);
+  height:min(720px,94vh);
+  margin:3vh auto;
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  gap:12px;
+  position:relative;z-index:2;
+}
+header{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{
+  width:66px;height:66px;border-radius:19px;
+  display:grid;place-items:center;
+  background:linear-gradient(145deg,#ffe372,#ffb340);
+  color:var(--navy);font-size:38px;
+  box-shadow:0 7px 0 rgba(0,0,0,.23);
+  transform:rotate(-3deg)
+}
+h1{margin:0;font-size:clamp(27px,3vw,43px);line-height:1}
+.sub{margin:6px 0 0;color:#def7fb;font-size:clamp(13px,1.4vw,18px)}
+.status{
+  min-width:300px;padding:11px 15px;border-radius:18px;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.24);
+  backdrop-filter:blur(7px)
+}
+.statusrow{display:flex;justify-content:space-between;gap:16px;font-weight:900;margin-bottom:8px}
+.bar{height:12px;border-radius:999px;background:rgba(0,0,0,.24);overflow:hidden}
+.bar div{height:100%;width:0;background:linear-gradient(90deg,#ffe069,#ffad38);transition:.35s}
+main{min-height:0;display:grid;grid-template-columns:250px 1fr;gap:14px}
+.side{
+  border-radius:24px;padding:17px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.22);
+  backdrop-filter:blur(7px);
+  display:flex;flex-direction:column;justify-content:space-between
+}
+.agent{text-align:center;font-size:95px;filter:drop-shadow(0 8px 4px rgba(0,0,0,.24));animation:float 3.3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-8px) rotate(2deg)}}
+.mission,.help{border-radius:16px;background:rgba(2,33,52,.47);padding:13px;line-height:1.38}
+.mission{font-size:15px}.help{font-size:13px;color:#e2f8fb;margin-top:12px}
+.panel{
+  min-height:0;position:relative;overflow:hidden;
+  border-radius:27px;background:var(--paper);color:var(--ink);
+  box-shadow:0 13px 0 rgba(0,22,37,.28);
+  padding:clamp(18px,2.3vw,32px);
+  display:flex;flex-direction:column;justify-content:center
+}
+.panel:before{
+  content:"";position:absolute;right:-65px;top:-70px;width:195px;height:195px;border-radius:50%;
+  background:rgba(99,212,229,.18)
+}
+.level{
+  width:max-content;max-width:92%;
+  padding:7px 13px;border-radius:999px;
+  background:#e5f8fb;color:#23657a;font-size:14px;font-weight:900;margin-bottom:10px
+}
+.title{margin:0 0 7px;font-size:clamp(24px,2.7vw,36px);line-height:1.08}
+.instructions{margin:0 0 16px;color:#496777;font-size:15px;line-height:1.35}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.card{
+  min-height:100px;border:3px solid var(--soft);background:#fff;color:var(--ink);
+  border-radius:17px;padding:11px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  font-weight:900;box-shadow:0 5px 0 #b7cdd5;cursor:pointer;transition:.12s;text-align:center
+}
+.card:hover{transform:translateY(-2px);border-color:var(--cyan)}
+.card.selected{background:#fff6d5;border-color:#f5bd27;box-shadow:0 5px 0 #d9a820}
+.card.correct{background:#e8fff2;border-color:var(--green);box-shadow:0 5px 0 #188d51}
+.card.wrong{background:#fff0f2;border-color:var(--red);box-shadow:0 5px 0 #b93847}
+.emoji{font-size:34px;line-height:1}
+.actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:15px}
+.btn{border:0;border-radius:13px;padding:11px 18px;font:inherit;font-weight:900;cursor:pointer}
+.primary{background:var(--navy);color:white;box-shadow:0 4px 0 #061a28}
+.secondary{background:#eaf5f7;color:var(--ink)}
+.feedback{
+  display:none;margin-top:12px;border-radius:14px;padding:11px 14px;
+  font-weight:900;line-height:1.35
+}
+.feedback.show{display:block}.feedback.good{background:#e8fff2;color:#0b7c42}.feedback.bad{background:#fff0f2;color:#9e2738}
+.quizbox{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.data{
+  background:#e9f8fb;border-radius:18px;padding:17px;text-align:center;
+  display:flex;flex-direction:column;justify-content:center
+}
+.object{font-size:65px}.formula{font-size:20px;font-weight:900;margin-top:5px}.mini{font-size:14px;color:#4c6a78;margin-top:5px}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.option{
+  min-height:68px;border-radius:15px;border:3px solid var(--soft);
+  background:white;color:var(--ink);font-weight:900;padding:10px;cursor:pointer;
+  box-shadow:0 4px 0 #b7cdd5;text-align:left
+}
+.option:hover{border-color:var(--cyan)}
+.option.correct{background:#e8fff2;border-color:var(--green)}
+.option.wrong{background:#fff0f2;border-color:var(--red)}
+.sort-area{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.bin{
+  min-height:195px;border-radius:19px;border:3px dashed #8db6c2;
+  padding:12px;background:#edfafd;display:flex;flex-direction:column;align-items:center
+}
+.bin h3{margin:0 0 9px;font-size:20px}
+.bin.float{background:linear-gradient(#edfafd 55%,#b8eef5 55%)}
+.bin.sink{background:linear-gradient(#edfafd 46%,#8ed9e6 46%)}
+.items{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.item{
+  border:2px solid #b8d0d8;background:white;border-radius:12px;padding:8px 10px;
+  cursor:pointer;font-weight:900;display:flex;align-items:center;gap:5px
+}
+.item.active{border-color:#f1b91f;background:#fff6d5}
+.item.placed{opacity:.36;pointer-events:none}
+.selection{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.material{
+  border:3px solid var(--soft);border-radius:16px;background:white;padding:10px;
+  min-height:105px;text-align:center;cursor:pointer;font-weight:900;box-shadow:0 4px 0 #b7cdd5
+}
+.material.chosen{background:#fff6d5;border-color:#f5bd27}
+.material .emoji{font-size:31px}
+.end{text-align:center}.end .big{font-size:86px}.end h2{font-size:clamp(31px,4vw,44px);margin:8px 0}.end p{font-size:18px;line-height:1.45;max-width:690px;margin:0 auto 17px}
+footer{display:flex;justify-content:space-between;align-items:center;color:#def7fb;font-size:14px}
+.smallbtn{border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.13);color:white;border-radius:11px;padding:8px 12px;cursor:pointer}
+@media(max-width:820px){
+ .app{height:96vh;margin:2vh auto}header{grid-template-columns:1fr}.status{min-width:0}main{grid-template-columns:1fr}.side{display:none}
+}
+@media(max-width:570px){
+ .grid,.selection{grid-template-columns:repeat(2,1fr)}.quizbox,.sort-area{grid-template-columns:1fr}.card{min-height:80px}.app{width:97vw}
+ .logo{width:52px;height:52px;font-size:30px}.panel{padding:15px}.bin{min-height:125px}
+}
+</style>
+</head>
+<body>
+<div class="bubble b1"></div><div class="bubble b2"></div>
+<div class="app">
+<header>
+ <div class="brand">
+  <div class="logo">⚗️</div>
+  <div><h1>Operación Flotabilidad</h1><p class="sub">Actividad 3 · UD 7 · Materia y energía</p></div>
+ </div>
+ <div class="status">
+  <div class="statusrow"><span id="stageText">Reto 1 de 4</span><span id="scoreText">⭐ 0 · ❤️❤️❤️</span></div>
+  <div class="bar"><div id="progress"></div></div>
+ </div>
+</header>
+
+<main>
+<aside class="side">
+ <div>
+  <div class="agent" id="agent">🧑‍🔬</div>
+  <div class="mission"><strong>Alerta del laboratorio:</strong><br>Una cápsula científica ha caído al agua. Supera los retos y construye una plataforma capaz de mantenerla a flote.</div>
+ </div>
+ <div class="help" id="help">Selecciona tus respuestas y compruébalas. Los errores activan pistas científicas.</div>
+</aside>
+<section class="panel" id="panel"></section>
+</main>
+
+<footer><span>Agentes 2030 · Laboratorio de Materia y Energía</span><button class="smallbtn" onclick="location.reload()">Reiniciar misión</button></footer>
+</div>
+
+<script>
+let stage=0,score=0,lives=3,selected=[],quizIndex=0,activeItem=null,placements={float:[],sink:[]};
+const panel=document.getElementById("panel");
+const progress=document.getElementById("progress");
+const stageText=document.getElementById("stageText");
+const scoreText=document.getElementById("scoreText");
+const agent=document.getElementById("agent");
+const help=document.getElementById("help");
+
+function update(){
+ stageText.textContent=stage<4?`Reto ${stage+1} de 4`:"Misión completada";
+ progress.style.width=`${Math.min(stage,4)*25}%`;
+ scoreText.textContent=`⭐ ${score} · ${"❤️".repeat(lives)}${"🤍".repeat(3-lives)}`;
+}
+function lose(){lives=Math.max(0,lives-1);update()}
+function nextStage(){stage++;selected=[];quizIndex=0;activeItem=null;placements={float:[],sink:[]};update();render()}
+function feedback(msg,good){
+ const f=document.getElementById("feedback");
+ f.className=`feedback show ${good?"good":"bad"}`;
+ f.innerHTML=msg;
+}
+function render(){
+ if(stage===0) renderMatter();
+ else if(stage===1) renderDensity();
+ else if(stage===2) renderTank();
+ else if(stage===3) renderBuild();
+ else renderEnd();
+}
+function renderMatter(){
+ agent.textContent="🧑‍🔬";help.textContent="Selecciona todos los elementos que son materia: deben tener masa y ocupar un lugar.";
+ const items=[
+  {e:"🪨",n:"Piedra",ok:true},{e:"🎈",n:"Aire del globo",ok:true},
+  {e:"💧",n:"Agua",ok:true},{e:"💡",n:"Luz",ok:false},
+  {e:"🔊",n:"Sonido",ok:false},{e:"🌑",n:"Sombra",ok:false}
+ ];
+ panel.innerHTML=`<span class="level">RETO 1 · MATERIA O IMPOSTOR</span>
+ <h2 class="title">¿Qué elementos son materia?</h2>
+ <p class="instructions">Selecciona exactamente tres. Recuerda: la materia tiene masa y ocupa espacio.</p>
+ <div class="grid" id="matterGrid"></div>
+ <div class="feedback" id="feedback"></div>
+ <div class="actions"><button class="btn primary" onclick="checkMatter()">Comprobar selección</button></div>`;
+ const grid=document.getElementById("matterGrid");
+ items.forEach((x,i)=>{
+  const d=document.createElement("div");d.className="card";d.dataset.i=i;d.dataset.ok=x.ok;
+  d.innerHTML=`<span class="emoji">${x.e}</span><span>${x.n}</span>`;
+  d.onclick=()=>{d.classList.toggle("selected");selected=selected.includes(i)?selected.filter(v=>v!==i):[...selected,i]};
+  grid.appendChild(d);
+ });
+}
+function checkMatter(){
+ const cards=[...document.querySelectorAll(".card")];
+ const correct=cards.filter(c=>c.dataset.ok==="true").map(c=>Number(c.dataset.i));
+ const ok=selected.length===3 && correct.every(i=>selected.includes(i));
+ cards.forEach(c=>{
+  if(c.dataset.ok==="true")c.classList.add("correct");
+  else if(selected.includes(Number(c.dataset.i)))c.classList.add("wrong");
+  c.onclick=null;
+ });
+ if(ok){score+=3;update();feedback("✅ ¡Clasificación correcta! Piedra, agua y aire son materia.",true)}
+ else{lose();feedback("💡 La luz, el sonido y la sombra no son materia. El aire sí tiene masa y ocupa espacio.",false)}
+ document.querySelector(".actions").innerHTML=`<button class="btn primary" onclick="nextStage()">Ir al reto 2 ➜</button>`;
+}
+const densityCases=[
+ {e:"🧊",mass:92,vol:100,d:"0,92 g/cm³",float:"Flota",ans:0,why:"Su densidad es menor que la del agua."},
+ {e:"🪨",mass:270,vol:100,d:"2,7 g/cm³",float:"Se hunde",ans:1,why:"Su densidad es mayor que la del agua."},
+ {e:"🪵",mass:60,vol:100,d:"0,6 g/cm³",float:"Flota",ans:0,why:"Su densidad es menor que 1 g/cm³."}
+];
+function renderDensity(){
+ agent.textContent="⚖️";help.textContent="Compara masa y volumen. En este juego, un objeto con densidad menor que el agua flota.";
+ const c=densityCases[quizIndex];
+ panel.innerHTML=`<span class="level">RETO 2 · DENSIDAD EXPRÉS · CASO ${quizIndex+1}/3</span>
+ <h2 class="title">Calcula y predice</h2>
+ <p class="instructions">Densidad = masa ÷ volumen. El agua tiene una densidad aproximada de 1 g/cm³.</p>
+ <div class="quizbox">
+  <div class="data"><div class="object">${c.e}</div><div class="formula">Masa: ${c.mass} g · Volumen: ${c.vol} cm³</div><div class="mini">Densidad del objeto: ${c.d}</div></div>
+  <div class="options">
+   <button class="option" onclick="answerDensity(0,this)">🌊 Flotará</button>
+   <button class="option" onclick="answerDensity(1,this)">⬇️ Se hundirá</button>
+   <button class="option" onclick="answerDensity(2,this)">⚖️ Quedará siempre en el aire</button>
+   <button class="option" onclick="answerDensity(3,this)">❓ No depende de la densidad</button>
+  </div>
+ </div>
+ <div class="feedback" id="feedback"></div>`;
+}
+function answerDensity(ans,btn){
+ const c=densityCases[quizIndex],buttons=[...document.querySelectorAll(".option")];
+ buttons.forEach(b=>b.disabled=true);buttons[c.ans].classList.add("correct");
+ if(ans===c.ans){score+=2;btn.classList.add("correct");feedback(`✅ ${c.float}. ${c.why}`,true)}
+ else{lose();btn.classList.add("wrong");feedback(`💡 ${c.float}. ${c.why}`,false)}
+ setTimeout(()=>{
+  quizIndex++;
+  if(quizIndex<densityCases.length)renderDensity();
+  else{panel.innerHTML+=`<div class="actions"><button class="btn primary" onclick="nextStage()">Ir al tanque ➜</button></div>`}
+  update();
+ },850);
+}
+const tankItems=[
+ {id:"cork",e:"🟤",n:"Corcho",bin:"float"},
+ {id:"wood",e:"🪵",n:"Madera",bin:"float"},
+ {id:"ice",e:"🧊",n:"Hielo",bin:"float"},
+ {id:"iron",e:"🔩",n:"Hierro",bin:"sink"},
+ {id:"stone",e:"🪨",n:"Piedra",bin:"sink"},
+ {id:"glass",e:"🔮",n:"Vidrio",bin:"sink"}
+];
+function renderTank(){
+ agent.textContent="🧪";help.textContent="Pulsa un objeto y después el tanque donde crees que terminará.";
+ panel.innerHTML=`<span class="level">RETO 3 · TANQUE DE FLOTACIÓN</span>
+ <h2 class="title">Clasifica los objetos</h2>
+ <p class="instructions">Selecciona cada objeto y colócalo en “flota” o “se hunde”.</p>
+ <div class="items" id="source"></div>
+ <div class="sort-area">
+  <div class="bin float" onclick="place('float')"><h3>🌊 FLOTA</h3><div class="items" id="floatItems"></div></div>
+  <div class="bin sink" onclick="place('sink')"><h3>⬇️ SE HUNDE</h3><div class="items" id="sinkItems"></div></div>
+ </div>
+ <div class="feedback" id="feedback"></div>
+ <div class="actions"><button class="btn primary" onclick="checkTank()">Comprobar tanque</button></div>`;
+ const source=document.getElementById("source");
+ tankItems.forEach(x=>{
+  const b=document.createElement("button");b.className="item";b.id=x.id;b.innerHTML=`${x.e} ${x.n}`;
+  b.onclick=e=>{e.stopPropagation();document.querySelectorAll(".item").forEach(z=>z.classList.remove("active"));b.classList.add("active");activeItem=x.id};
+  source.appendChild(b);
+ });
+}
+function place(bin){
+ if(!activeItem)return;
+ const item=tankItems.find(x=>x.id===activeItem);
+ placements.float=placements.float.filter(x=>x!==activeItem);
+ placements.sink=placements.sink.filter(x=>x!==activeItem);
+ placements[bin].push(activeItem);
+ const b=document.getElementById(activeItem);
+ b.classList.remove("active");b.classList.add("placed");
+ const copy=document.createElement("span");copy.className="item";copy.textContent=`${item.e} ${item.n}`;
+ document.getElementById(bin+"Items").appendChild(copy);
+ activeItem=null;
+}
+function checkTank(){
+ if(placements.float.length+placements.sink.length<6){feedback("⚠️ Debes colocar los seis objetos antes de comprobar.",false);return}
+ let correct=0;
+ tankItems.forEach(x=>{if(placements[x.bin].includes(x.id))correct++});
+ if(correct===6){score+=5;update();feedback("✅ ¡Tanque perfecto! Has relacionado correctamente densidad y flotabilidad.",true)}
+ else{lose();feedback(`💡 Has acertado ${correct} de 6. En este modelo flotan corcho, madera y hielo; se hunden hierro, piedra y vidrio.`,false)}
+ document.querySelector(".actions").innerHTML=`<button class="btn primary" onclick="nextStage()">Reto final ➜</button>`;
+}
+const materials=[
+ {id:"cork",e:"🟤",n:"Bloques de corcho",ok:true},
+ {id:"wood",e:"🪵",n:"Tablas de madera",ok:true},
+ {id:"bottle",e:"🧴",n:"Recipientes cerrados",ok:true},
+ {id:"stone",e:"🪨",n:"Bloques de piedra",ok:false},
+ {id:"iron",e:"🔩",n:"Placas macizas de hierro",ok:false},
+ {id:"marble",e:"🔮",n:"Canicas de vidrio",ok:false}
+];
+function renderBuild(){
+ agent.textContent="🛠️";help.textContent="Elige tres materiales que aporten flotabilidad y permitan construir una plataforma estable.";
+ panel.innerHTML=`<span class="level">RETO 4 · RESCATE DE LA CÁPSULA</span>
+ <h2 class="title">Construye una plataforma flotante</h2>
+ <p class="instructions">Selecciona exactamente tres materiales adecuados para sostener la cápsula científica.</p>
+ <div class="selection" id="materials"></div>
+ <div class="feedback" id="feedback"></div>
+ <div class="actions"><button class="btn primary" onclick="checkBuild()">Probar plataforma</button></div>`;
+ const area=document.getElementById("materials");
+ materials.forEach((x,i)=>{
+  const d=document.createElement("div");d.className="material";d.dataset.i=i;
+  d.innerHTML=`<div class="emoji">${x.e}</div><div>${x.n}</div>`;
+  d.onclick=()=>{d.classList.toggle("chosen");selected=selected.includes(i)?selected.filter(v=>v!==i):[...selected,i]};
+  area.appendChild(d);
+ });
+}
+function checkBuild(){
+ const correct=materials.map((x,i)=>x.ok?i:null).filter(x=>x!==null);
+ const ok=selected.length===3&&correct.every(i=>selected.includes(i));
+ document.querySelectorAll(".material").forEach((d,i)=>{
+  if(materials[i].ok)d.classList.add("correct");
+  else if(selected.includes(i))d.classList.add("wrong");
+  d.onclick=null;
+ });
+ if(ok){score+=5;update();feedback("✅ ¡Diseño aprobado! El corcho, la madera y los recipientes cerrados aportan flotabilidad.",true)}
+ else{lose();feedback("💡 La piedra, el vidrio y el hierro macizo aumentan demasiado la densidad del conjunto. Convienen materiales ligeros o con aire encerrado.",false)}
+ document.querySelector(".actions").innerHTML=`<button class="btn primary" onclick="nextStage()">Ver resultado final ➜</button>`;
+}
+function renderEnd(){
+ progress.style.width="100%";agent.textContent="🏆";help.textContent="Misión finalizada. Puedes repetirla para mejorar la puntuación y consolidar lo aprendido.";
+ let medal="🥉",title="Cápsula recuperada",msg="Has completado la misión y reforzado las propiedades básicas de la materia.";
+ if(score>=15){medal="🏆";title="¡Especialista en Materia 2030!";msg="Has dominado masa, volumen, densidad y flotabilidad con un resultado excelente."}
+ else if(score>=10){medal="🥈";title="¡Gran trabajo científico!";msg="Comprendes las relaciones principales. Un nuevo intento puede llevarte a la máxima insignia."}
+ panel.innerHTML=`<div class="end"><div class="big">${medal}</div><h2>${title}</h2><p>Has conseguido <strong>${score} estrellas</strong>.<br>${msg}</p><button class="btn primary" onclick="location.reload()">Jugar de nuevo</button></div>`;
+ update();
+}
+update();render();
+</script>
+</body>
+</html>
